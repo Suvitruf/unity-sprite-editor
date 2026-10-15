@@ -13,7 +13,7 @@ Use public Unity APIs and the public Sprite Editor Data Provider interfaces. Pre
 Install Unity Test Framework in the host project. Add this entry to the root object of `Packages/manifest.json`, preserving its existing dependencies and other settings:
 
 ```json
-"testables": ["com.apanasik.better-sprite-editor"]
+"testables": ["com.suvitruf.better-sprite-editor"]
 ```
 
 If `testables` already exists, append the package name to its array. Open **Window > General > Test Runner**, select **EditMode**, and run the package tests. Importer tests create and remove disposable fixture assets.

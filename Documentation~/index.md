@@ -55,4 +55,4 @@ Standard TextureImporter sprites use a compatibility fallback on older editors, 
 
 ## Tests
 
-Install Unity Test Framework and run the package's EditMode tests in Test Runner. For UPM installs, add `"com.apanasik.better-sprite-editor"` to the host manifest's `testables` array. Importer tests create temporary assets and remove them afterwards. The tests also cover recovery, grid sizing, shared pivots, reference scans, and save conflict detection.
+Install Unity Test Framework and run the package's EditMode tests in Test Runner. For UPM installs, add `"com.suvitruf.better-sprite-editor"` to the host manifest's `testables` array. Importer tests create temporary assets and remove them afterwards. The tests also cover recovery, grid sizing, shared pivots, reference scans, and save conflict detection.
