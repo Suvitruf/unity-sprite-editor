@@ -1,0 +1,28 @@
+{
+  "name": "com.apanasik.better-sprite-editor",
+  "displayName": "Better Sprite Editor",
+  "version": "0.1.0",
+  "unity": "2023.1",
+  "description": "Sprite metadata editing for Unity: multi-select and multi-edit, slicing, region combining and splitting, batch renaming, undo history, shape editing, and customizable input.",
+  "category": "2D",
+  "keywords": [
+    "2d",
+    "sprite",
+    "sprite editor",
+    "slicing"
+  ],
+  "author": {
+    "name": "Andrei Apanasik"
+  },
+  "dependencies": {
+    "com.unity.2d.sprite": "1.0.0"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Suvitruf/unity-sprite-editor.git"
+  },
+  "documentationUrl": "https://github.com/Suvitruf/unity-sprite-editor/blob/master/Documentation~/index.md",
+  "changelogUrl": "https://github.com/Suvitruf/unity-sprite-editor/blob/master/CHANGELOG.md",
+  "licensesUrl": "https://github.com/Suvitruf/unity-sprite-editor/blob/master/LICENSE"
+}

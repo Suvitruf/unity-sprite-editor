@@ -1,0 +1,7 @@
+{
+    "name": "BetterSpriteEditor.TestFixtures",
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "autoReferenced": false
+}

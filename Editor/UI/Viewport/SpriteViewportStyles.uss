@@ -1,0 +1,22 @@
+/* Editor built-in cursors are only reachable through USS keywords,
+   so the viewport toggles these classes from code. */
+
+.bse-cursor-resize-horizontal {
+    cursor: resize-horizontal;
+}
+
+.bse-cursor-resize-vertical {
+    cursor: resize-vertical;
+}
+
+.bse-cursor-resize-up-left {
+    cursor: resize-up-left;
+}
+
+.bse-cursor-resize-up-right {
+    cursor: resize-up-right;
+}
+
+.bse-cursor-move {
+    cursor: move-arrow;
+}

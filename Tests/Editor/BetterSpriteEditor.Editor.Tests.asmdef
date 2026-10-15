@@ -1,0 +1,15 @@
+{
+    "name": "BetterSpriteEditor.Editor.Tests",
+    "references": [
+        "BetterSpriteEditor.Editor",
+        "Unity.2D.Sprite.Editor",
+        "BetterSpriteEditor.TestFixtures"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "autoReferenced": false
+}

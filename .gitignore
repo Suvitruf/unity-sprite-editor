@@ -1,0 +1,21 @@
+# Local Unity projects and generated state
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Bb]uild/
+/[Bb]uilds/
+/.validation~/
+
+# Local IDE and operating-system files
+.vs/
+.idea/
+.vscode/
+*.csproj
+*.sln
+*.slnx
+*.user
+*.pidb
+.DS_Store
+Thumbs.db
