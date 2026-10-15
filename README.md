@@ -153,6 +153,12 @@ See the [user guide](Documentation~/index.md) for saving, recovery, and detailed
 
 Source is in `Editor/`, and regression tests are in `Tests/`. See [Contributing](CONTRIBUTING.md) for setup, tests, and release checks.
 
+## Support & community
+
+**Join on [Discord](https://discord.gg/3aDtVmNRMY)** — chat about the project, follow progress, ask questions, share ideas, or help test.
+
+**Support development** — this is a free, open-source labour of love built in spare time. If you'd like to help it move along faster, you can support me on [Patreon](https://www.patreon.com/apanasik).
+
 ## License
 
 [MIT](LICENSE) — Copyright (c) 2026 Andrei Apanasik.
