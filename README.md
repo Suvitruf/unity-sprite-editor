@@ -1,8 +1,10 @@
 # Better Sprite Editor
 
-> Developed while working on [Pocket Cat Desktop](https://store.steampowered.com/app/4865920/Pocket_Cat_Desktop/), this tool grew out of the sprite-editing needs of that project.
+> Developed while working on [Pocket Cat Desktop](https://store.steampowered.com/app/4865920/Pocket_Cat_Desktop/?utm_source=github&utm_medium=web&utm_campaign=better_sprite_editor&utm_content=suvitruf), this tool grew out of the sprite-editing needs of that project.
 
 A standalone Unity editor window for sprite metadata workflows: multi-select, batch renaming, region combining and splitting, browsable undo history, usage search, and tunable outline and physics-shape generation. Built on Unity's public Sprite Editor Data Provider API.
+
+![Better Sprite Editor](https://projects.cdn.aapanasik.com/better-sprite-editor/better-sprite-editor.png)
 
 ## Requirements
 
@@ -15,7 +17,29 @@ The package targets Unity 2023.1 and newer. Automated compatibility checks pass 
 
 ## Installation
 
-In Unity, open **Window > Package Management > Package Manager**, choose **Install package from Git URL**, and enter:
+### OpenUPM (recommended)
+
+[![openupm](https://img.shields.io/npm/v/com.suvitruf.better-sprite-editor?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.suvitruf.better-sprite-editor/)
+
+Via the [openupm-cli](https://openupm.com/):
+
+```
+openupm add com.suvitruf.better-sprite-editor
+```
+
+Or add the scoped registry manually — **Edit → Project Settings → Package Manager → Scoped
+Registries**, add:
+
+- **Name**: `package.openupm.com`
+- **URL**: `https://package.openupm.com`
+- **Scope(s)**: `com.suvitruf`
+
+then install **Better Sprite Editor** from **Window → Package Manager → My Registries**.
+
+### Git URL
+
+Alternatively, in the Package Manager choose **Add package from git URL** and paste:
+
 
 ```text
 https://github.com/Suvitruf/unity-sprite-editor.git
