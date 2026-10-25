@@ -21,6 +21,8 @@ namespace BetterSpriteEditor.Model
             && Capabilities.Has(SpriteEditCapabilities.CreateAndDeleteSprite);
         internal bool CanEditRect => ImportMode == SpriteImportMode.Multiple
             && Capabilities.Has(SpriteEditCapabilities.EditSpriteRect);
+        internal bool CanPreservePivotPosition => CanEditRect
+            && Capabilities.Has(SpriteEditCapabilities.EditPivot);
         internal bool CanEditName => ImportMode == SpriteImportMode.Multiple
             && Capabilities.Has(SpriteEditCapabilities.EditSpriteName);
         public Texture2D Texture { get; }

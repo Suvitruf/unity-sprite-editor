@@ -125,6 +125,29 @@ namespace BetterSpriteEditor.Model
                 Rect.yMin + normalized.y * Rect.height);
         }
 
+        /// <summary>
+        /// Keeps the original texture-space anchor after a rect edit. Call after the new
+        /// rect has been clamped to valid bounds, using the pre-edit (or drag-start) snapshot.
+        /// </summary>
+        internal void PreservePivotTexturePosition(SpriteRegion before)
+        {
+            // Restore these first: returning a drag to its starting rect must also restore
+            // the original preset and its stored custom value, without an undo entry.
+            Alignment = before.Alignment;
+            Pivot = before.Pivot;
+            if (Rect.Equals(before.Rect))
+                return;
+
+            var anchor = before.GetPivotTexturePosition();
+            if (GetPivotTexturePosition().Equals(anchor))
+                return; // The original alignment still expresses the same anchor.
+
+            Alignment = SpriteAlignment.Custom;
+            Pivot = new Vector2(
+                (anchor.x - Rect.xMin) / Rect.width,
+                (anchor.y - Rect.yMin) / Rect.height);
+        }
+
         /// <summary>Copies all editable fields (not the Id) from another region.</summary>
         public void CopyFrom(SpriteRegion source)
         {

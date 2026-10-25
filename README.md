@@ -63,6 +63,7 @@ For a local checkout, keep this folder outside your project's `Assets` directory
 - **Unity-style multi-edit inspector** — shared values show normally, differing values show the mixed dash `—`; committing a value writes it to every selected region as one undo step.
 - **Interactive 9-slice borders** — drag the mid-edge points; border lines stay visible on every bordered region, selected or not.
 - **Draggable pivots** — a blue ring on every selected region. Grabbing a preset pivot (e.g. BottomCenter) converts it to Custom *in place*, so it never jumps. Pivot values can be shown in normalized units or pixels.
+- **Keep Pivot Position** — an optional toggle under Rect keeps pivots anchored to the artwork when moving or resizing regions, including numeric multi-edit and nudging. Presets become Custom only when needed; undo restores both the rect and pivot.
 - **Pivot alignment** — align pivots across selected regions.
 - **Live inspector** — values update while you drag, not on mouse release.
 

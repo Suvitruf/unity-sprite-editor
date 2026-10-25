@@ -4,6 +4,10 @@ All notable changes to this package are documented in this file. The format is b
 
 ## [Unreleased]
 
+### Added
+
+- Keep Pivot Position toggle in the region inspector: preserve each pivot's texture position during rectangle resizing, movement, nudging, and numeric multi-edit, with undo/redo and recovery support.
+
 ## [0.1.0] - 2026-10-08
 
 Initial release.

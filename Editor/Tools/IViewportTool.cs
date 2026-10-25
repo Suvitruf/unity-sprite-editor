@@ -15,6 +15,7 @@ namespace BetterSpriteEditor.Tools
         public HistoryStack History;
         public ViewportTransform Transform;
         public VisualElement RepaintTarget;
+        internal bool KeepPivotPosition;
 
         /// <summary>Raised while a drag mutates regions, so the inspector can follow live.</summary>
         public event Action LiveEdited;

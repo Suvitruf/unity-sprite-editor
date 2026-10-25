@@ -27,6 +27,12 @@ Open a texture in the editor via one of:
 - right-click a texture in the Project window → `Open in Better Sprite Editor`,
 - the texture importer inspector's context menu (⋮) → `Open in Better Sprite Editor`.
 
+## Keeping pivots anchored
+
+Select a region and enable **Keep Pivot Position** under **Rect** in the inspector. Moving or resizing the rectangle then keeps its pivot at the same point in the texture. This applies to viewport handles, group movement, arrow-key nudging, and the X/Y/W/H fields, including multi-selection. Each selected region keeps its own anchor.
+
+The option is off by default and remembered as an editor preference. A preset alignment changes to Custom only when needed to retain the anchor. Pivots may end up outside the new rectangle; their position is preserved without rounding to whole pixels. Undo/redo restores the rectangle and pivot together. The option is available only when both rectangle and pivot editing are supported, in Multiple mode.
+
 ## Saving and recovery
 
 Apply (Ctrl+S) writes sprite metadata and reimports the texture. Revert reloads the asset and discards unapplied edits and history. Closing or switching textures offers Save/Discard/Cancel; opening the same texture keeps the current session. A failed save keeps the document open.

@@ -47,6 +47,7 @@ namespace BetterSpriteEditor.Tools
         private DragKind dragKind = DragKind.None;
         private RectHandle dragHandle = RectHandle.None;
         private Vector2 dragStartTexturePos;
+        private bool keepPivotDuringDrag;
 
         // Resize/border drag (single region).
         private SpriteRegion draggedRegion;
@@ -154,12 +155,16 @@ namespace BetterSpriteEditor.Tools
                         var rect = snapshot.Rect;
                         rect.position += clamped;
                         region.Rect = rect;
+                        if (keepPivotDuringDrag && document.CanPreservePivotPosition)
+                            region.PreservePivotTexturePosition(snapshot);
                     }
                     break;
                 }
                 case DragKind.Resize:
                     draggedRegion.Rect = RectHandles.ResizeTextureRect(
                         dragStartRect, dragHandle, delta, document.TextureWidth, document.TextureHeight);
+                    if (keepPivotDuringDrag && document.CanPreservePivotPosition)
+                        draggedRegion.PreservePivotTexturePosition(dragStartSnapshot);
                     break;
                 case DragKind.Border:
                     draggedRegion.Border = DragBorder(dragStartSnapshot.Border, dragStartRect, dragHandle, delta);
@@ -248,6 +253,8 @@ namespace BetterSpriteEditor.Tools
                 var rect = region.Rect;
                 rect.position += nudge;
                 region.Rect = rect;
+                if (context.KeepPivotPosition && context.Document.CanPreservePivotPosition)
+                    region.PreservePivotTexturePosition(before);
                 commands.Add(new ModifyRegionCommand(context.Document, region.Id, before, region.Clone(), label));
             }
             context.History.PushApplied(commands.Count == 1
@@ -359,6 +366,7 @@ namespace BetterSpriteEditor.Tools
             dragKind = DragKind.Move;
             dragHandle = RectHandle.Body;
             dragStartTexturePos = texturePos;
+            keepPivotDuringDrag = context.KeepPivotPosition && context.Document.CanPreservePivotPosition;
         }
 
         private void FinishMoveDrag()
@@ -555,6 +563,7 @@ namespace BetterSpriteEditor.Tools
             dragStartSnapshot = region.Clone();
             dragStartRect = region.Rect;
             dragStartTexturePos = texturePos;
+            keepPivotDuringDrag = context.KeepPivotPosition && context.Document.CanPreservePivotPosition;
         }
 
         private void FinishSingleDrag()

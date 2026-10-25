@@ -223,6 +223,34 @@ namespace BetterSpriteEditor.Tests
             Assert.That(newId, Is.EqualTo(id));
         }
 
+        [TestCase(0.5f, 0.5f)]
+        [TestCase(-0.25f, 1.5f)]
+        public void Apply_ResizePreservesPivotAnchorAndSpriteIdentity(float pivotX, float pivotY)
+        {
+            var document = SpriteDocumentRepository.Load(texture);
+            var region = document.Regions.Find(r => r.Name == "A");
+            region.Alignment = SpriteAlignment.Custom;
+            region.Pivot = new Vector2(pivotX, pivotY);
+            SpriteDocumentRepository.Save(document);
+            var sprite = AssetDatabase.LoadAllAssetsAtPath(path).OfType<Sprite>().First(s => s.name == "A");
+            AssetDatabase.TryGetGUIDAndLocalFileIdentifier(sprite, out string guid, out long id);
+            document = SpriteDocumentRepository.Load(texture);
+            region = document.Regions.Find(r => r.Name == "A");
+            var before = region.Clone();
+            var anchor = region.GetPivotTexturePosition();
+            region.Rect = new Rect(2, 1, 4, 5);
+            region.PreservePivotTexturePosition(before);
+            SpriteDocumentRepository.Save(document);
+            var restored = SpriteDocumentRepository.Load(texture).FindRegion(before.Id);
+            Assert.That(restored, Is.Not.Null);
+            Assert.That(Vector2.Distance(restored.GetPivotTexturePosition(), anchor), Is.LessThan(0.0001f));
+            sprite = AssetDatabase.LoadAllAssetsAtPath(path).OfType<Sprite>().First(s => s.name == "A");
+            AssetDatabase.TryGetGUIDAndLocalFileIdentifier(sprite, out string newGuid, out long newId);
+            Assert.That(newGuid, Is.EqualTo(guid));
+            Assert.That(newId, Is.EqualTo(id));
+            Assert.That(Vector2.Distance(sprite.rect.position + sprite.pivot, anchor), Is.LessThan(0.0001f));
+        }
+
         [Test]
         public void Apply_ExternalChangeIsRejectedWithoutOverwritingMetadata()
         {

@@ -347,6 +347,11 @@ namespace BetterSpriteEditor.UI
             inspector.DragSelectionOut = TryStartDragOutOfSelection;
             inspector.GenerateShapes = GenerateShapesForSelection;
             inspector.ClearShapes = ClearShapesForSelection;
+            inspector.KeepPivotPositionChanged = keep =>
+            {
+                if (toolContext != null)
+                    toolContext.KeepPivotPosition = keep;
+            };
             inspector.SnapToPixelsChanged = snap =>
             {
                 if (shapeTool != null)
@@ -552,7 +557,8 @@ namespace BetterSpriteEditor.UI
                 Selection = selection,
                 History = history,
                 Transform = viewport.Transform,
-                RepaintTarget = viewport
+                RepaintTarget = viewport,
+                KeepPivotPosition = inspector.KeepPivotPosition
             };
             toolContext.LiveEdited += inspector.Refresh;
             selectTool = new SelectTool(toolContext);
