@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using BetterSpriteEditor.DataAccess;
 using BetterSpriteEditor.Model;
+using BetterSpriteEditor.Operations;
+using BetterSpriteEditor.Operations.Pivots;
 using BetterSpriteEditor.Operations.Usages;
 using NUnit.Framework;
 using UnityEditor;
@@ -221,6 +223,41 @@ namespace BetterSpriteEditor.Tests
             AssetDatabase.TryGetGUIDAndLocalFileIdentifier(sprite, out string newGuid, out long newId);
             Assert.That(newGuid, Is.EqualTo(guid));
             Assert.That(newId, Is.EqualTo(id));
+        }
+
+        [Test]
+        public void Apply_RelativePivotShiftPreservesRectAndSpriteIdentity()
+        {
+            var document = SpriteDocumentRepository.Load(texture);
+            document.Regions[0].Alignment = SpriteAlignment.TopCenter;
+            document.Regions[1].Rect = new Rect(8, 0, 4, 6);
+            document.Regions[1].Alignment = SpriteAlignment.Custom;
+            document.Regions[1].Pivot = new Vector2(-0.25f, 1.5f);
+            SpriteDocumentRepository.Save(document);
+            document = SpriteDocumentRepository.Load(texture);
+            var originals = document.Regions.Select(r => r.Clone()).ToArray();
+            var ids = AssetDatabase.LoadAllAssetsAtPath(path).OfType<Sprite>().ToDictionary(s => s.name, s =>
+            {
+                AssetDatabase.TryGetGUIDAndLocalFileIdentifier(s, out string guid, out long id);
+                return (guid, id);
+            });
+            var offset = new Vector2(2.25f, -3.5f);
+            var command = PivotOffset.CreateCommand(document, document.Regions, offset, out string error);
+            Assert.That(error, Is.Null);
+            new HistoryStack(document).Do(command);
+            SpriteDocumentRepository.Save(document);
+            var restored = SpriteDocumentRepository.Load(texture);
+            foreach (var original in originals)
+            {
+                var region = restored.FindRegion(original.Id);
+                Assert.That(region.Rect, Is.EqualTo(original.Rect));
+                var expected = original.GetPivotTexturePosition() + offset;
+                Assert.That(Vector2.Distance(region.GetPivotTexturePosition(), expected), Is.LessThan(0.0001f));
+                var sprite = AssetDatabase.LoadAllAssetsAtPath(path).OfType<Sprite>().First(s => s.name == original.Name);
+                AssetDatabase.TryGetGUIDAndLocalFileIdentifier(sprite, out string guid, out long id);
+                Assert.That((guid, id), Is.EqualTo(ids[original.Name]));
+                Assert.That(Vector2.Distance(sprite.rect.position + sprite.pivot, expected), Is.LessThan(0.0001f));
+            }
         }
 
         [TestCase(0.5f, 0.5f)]

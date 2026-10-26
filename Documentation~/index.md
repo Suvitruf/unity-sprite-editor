@@ -33,6 +33,12 @@ Select a region and enable **Keep Pivot Position** under **Rect** in the inspect
 
 The option is off by default and remembered as an editor preference. A preset alignment changes to Custom only when needed to retain the anchor. Pivots may end up outside the new rectangle; their position is preserved without rounding to whole pixels. Undo/redo restores the rectangle and pivot together. The option is available only when both rectangle and pivot editing are supported, in Multiple mode.
 
+## Shifting selected pivots
+
+Under **Pivot**, enter X and Y in **Offset (px)**, then click **Shift Pivots**. The offset is added to each selected pivot's current position: X = 2 and Y = -1 moves every pivot two pixels right and one pixel down. Different region sizes and starting pivots retain their differences. Positive Y moves up; fractional offsets and pivots outside the rectangle are supported.
+
+The offset always uses texture pixels, independent of Unit Mode and Keep Pivot Position. Changing the offset fields does not edit the sprites; each click applies the offset again as one undo step. Shifted presets become Custom, and undo restores their original alignment and value. Rectangles, borders, and outlines stay unchanged. The action works in Single and Multiple mode when pivot editing is supported. Use the main **Apply** action to save.
+
 ## Saving and recovery
 
 Apply (Ctrl+S) writes sprite metadata and reimports the texture. Revert reloads the asset and discards unapplied edits and history. Closing or switching textures offers Save/Discard/Cancel; opening the same texture keeps the current session. A failed save keeps the document open.

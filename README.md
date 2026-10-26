@@ -64,6 +64,7 @@ For a local checkout, keep this folder outside your project's `Assets` directory
 - **Interactive 9-slice borders** — drag the mid-edge points; border lines stay visible on every bordered region, selected or not.
 - **Draggable pivots** — a blue ring on every selected region. Grabbing a preset pivot (e.g. BottomCenter) converts it to Custom *in place*, so it never jumps. Pivot values can be shown in normalized units or pixels.
 - **Keep Pivot Position** — an optional toggle under Rect keeps pivots anchored to the artwork when moving or resizing regions, including numeric multi-edit and nudging. Presets become Custom only when needed; undo restores both the rect and pivot.
+- **Relative pivot offsets** — enter X/Y in pixels and click **Shift Pivots** to move every selected pivot from its current position, preserving differences across frame sizes and alignments. Each click is one undo step.
 - **Pivot alignment** — align pivots across selected regions.
 - **Live inspector** — values update while you drag, not on mouse release.
 
