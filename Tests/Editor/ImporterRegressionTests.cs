@@ -6,6 +6,7 @@ using BetterSpriteEditor.DataAccess;
 using BetterSpriteEditor.Model;
 using BetterSpriteEditor.Operations;
 using BetterSpriteEditor.Operations.Bounds;
+using BetterSpriteEditor.Operations.Clipboard;
 using BetterSpriteEditor.Operations.Pivots;
 using BetterSpriteEditor.Operations.Usages;
 using NUnit.Framework;
@@ -224,6 +225,58 @@ namespace BetterSpriteEditor.Tests
             AssetDatabase.TryGetGUIDAndLocalFileIdentifier(sprite, out string newGuid, out long newId);
             Assert.That(newGuid, Is.EqualTo(guid));
             Assert.That(newId, Is.EqualTo(id));
+        }
+
+        [Test]
+        public void Apply_PropertyClipboardTransfersBetweenTexturesAndPreservesReferences()
+        {
+            string targetPath = directory + "/target.png";
+            Assert.That(AssetDatabase.CopyAsset(path, targetPath), Is.True);
+            var sourceDocument = SpriteDocumentRepository.Load(texture);
+            var source = sourceDocument.Regions[0];
+            source.Alignment = SpriteAlignment.Custom;
+            source.Pivot = new Vector2(0.25f, 0.75f);
+            source.Border = Vector4.one;
+            source.Outlines = new List<Vector2[]> { new[] { new Vector2(-2, -2), new Vector2(2, -2), new Vector2(0, 2) } };
+            source.PhysicsOutlines = SpriteRegion.ClonePaths(source.Outlines);
+            source.OutlineTessellation = 0.2f;
+            source.PhysicsTessellation = 0.7f;
+            SpriteDocumentRepository.Save(sourceDocument);
+            sourceDocument = SpriteDocumentRepository.Load(texture);
+            var payload = SpritePropertyPayload.Capture(sourceDocument, sourceDocument.Regions[0]);
+            var targetTexture = AssetDatabase.LoadAssetAtPath<Texture2D>(targetPath);
+            var target = SpriteDocumentRepository.Load(targetTexture);
+            var originals = target.Regions.Select(r => r.Clone()).ToArray();
+            var ids = AssetDatabase.LoadAllAssetsAtPath(targetPath).OfType<Sprite>().ToDictionary(s => s.name, s =>
+            {
+                AssetDatabase.TryGetGUIDAndLocalFileIdentifier(s, out string guid, out long id);
+                return (guid, id);
+            });
+            var plan = SpritePropertyPaste.Build(target, target.Regions, payload,
+                new SpritePropertyPasteSettings { Fields = (SpritePropertyFields)63 });
+            Assert.That(plan.CanApply, Is.True, plan.Error);
+            var history = new HistoryStack(target);
+            history.Do(plan.CreateCommand(target));
+            SpriteDocumentRepository.Save(target);
+            var restored = SpriteDocumentRepository.Load(targetTexture);
+            foreach (var before in originals)
+            {
+                var after = restored.FindRegion(before.Id);
+                Assert.That(after.Rect, Is.EqualTo(before.Rect));
+                Assert.That(after.Name, Is.EqualTo(before.Name));
+                Assert.That(after.GetNormalizedPivot(), Is.EqualTo(payload.ResolvedPivot));
+                Assert.That(after.Border, Is.EqualTo(Vector4.one));
+                Assert.That(after.Outlines[0], Is.EqualTo(payload.Outlines[0].Points));
+                Assert.That(after.PhysicsOutlines[0], Is.EqualTo(payload.Physics[0].Points));
+                var sprite = AssetDatabase.LoadAllAssetsAtPath(targetPath).OfType<Sprite>().First(s => s.name == before.Name);
+                AssetDatabase.TryGetGUIDAndLocalFileIdentifier(sprite, out string guid, out long id);
+                Assert.That((guid, id), Is.EqualTo(ids[before.Name]));
+            }
+            history.Undo();
+            SpriteDocumentRepository.Save(target);
+            restored = SpriteDocumentRepository.Load(targetTexture);
+            foreach (var before in originals)
+                Assert.That(restored.FindRegion(before.Id).ContentEquals(before), Is.True);
         }
 
         [TestCase(false)]

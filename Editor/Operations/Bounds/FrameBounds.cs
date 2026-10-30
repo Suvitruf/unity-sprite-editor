@@ -275,26 +275,6 @@ namespace BetterSpriteEditor.Operations.Bounds
         private static bool Whole(float value) => Finite(value) && Math.Abs(value - Math.Round(value)) <= epsilon;
         private static FrameBoundsPlan Fail(FrameBoundsPlan plan, string error) { plan.Error = error; return plan; }
 
-        internal static bool SameRegion(SpriteRegion a, SpriteRegion b)
-        {
-            return a.Id == b.Id && a.Name == b.Name && a.Rect.Equals(b.Rect) && a.Alignment == b.Alignment
-                && a.Pivot.Equals(b.Pivot) && a.Border.Equals(b.Border) && a.CustomData == b.CustomData
-                && a.OutlineTessellation.Equals(b.OutlineTessellation) && a.PhysicsTessellation.Equals(b.PhysicsTessellation)
-                && SamePaths(a.Outlines, b.Outlines) && SamePaths(a.PhysicsOutlines, b.PhysicsOutlines);
-        }
-
-        private static bool SamePaths(List<Vector2[]> a, List<Vector2[]> b)
-        {
-            int count = a?.Count ?? 0;
-            if (count != (b?.Count ?? 0)) return false;
-            for (int i = 0; i < count; i++)
-            {
-                int length = a[i]?.Length ?? 0;
-                if (length != (b[i]?.Length ?? 0)) return false;
-                for (int j = 0; j < length; j++)
-                    if (!a[i][j].Equals(b[i][j])) return false;
-            }
-            return true;
-        }
+        internal static bool SameRegion(SpriteRegion a, SpriteRegion b) => a.ContentEquals(b);
     }
 }

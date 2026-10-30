@@ -70,6 +70,7 @@ For a local checkout, keep this folder outside your project's `Assets` directory
 
 ### Region operations
 
+- **Property and shape clipboard** — copy one sprite and selectively paste pivots, borders, outlines, physics shapes, and tessellation onto a selection, including across textures. Preview coordinate mappings and exclude incompatible targets before one undoable paste.
 - **Trim and uniform frame bounds** — the Bounds panel previews transparency trimming (alpha threshold and padding) or common frame sizes around existing pivots. Preserves sprite IDs, outline/collider positions, and 9-slice lines; reports conflicts before applying the batch as one undo step.
 - **Combine** (`Ctrl+E`) — merge selected regions into one covering their union rect, via a dialog for the new name and pivot. One undo restores the originals.
 - **Split** — divide a region into a grid (by cell count or size), skipping empty cells, with children named `<base name>0, 1, 2…` and validated against name collisions.

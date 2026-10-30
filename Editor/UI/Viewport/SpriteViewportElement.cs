@@ -14,7 +14,7 @@ namespace BetterSpriteEditor.UI.Viewport
     /// Gestures (hardcoded until the ShortcutRegistry owns them): wheel = zoom to cursor,
     /// RMB/MMB-drag or Space+LMB-drag = pan.
     /// </summary>
-    public class SpriteViewportElement : VisualElement
+    public partial class SpriteViewportElement : VisualElement
     {
         private const float pixelGridMinZoom = 8f;
 
@@ -139,6 +139,7 @@ namespace BetterSpriteEditor.UI.Viewport
             document = newDocument;
             selection = newSelection;
             previewRects = null;
+            propertyPreview = null;
             viewTransform.SetTextureSize(document?.TextureWidth ?? 0, document?.TextureHeight ?? 0);
             RebuildPreviewTexture();
 
@@ -511,6 +512,7 @@ namespace BetterSpriteEditor.UI.Viewport
             DrawPreviewShapes(painter);
             activeTool?.DrawOverlay(painter);
             DrawOnionSkin(context, painter);
+            DrawPropertyPreview(painter);
         }
 
         private static void DrawTextureQuad(MeshGenerationContext context, Rect rect, Texture texture)

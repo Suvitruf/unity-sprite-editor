@@ -174,6 +174,29 @@ namespace BetterSpriteEditor.Model
             return result;
         }
 
+        internal bool ContentEquals(SpriteRegion other)
+        {
+            return other != null && Id == other.Id && Name == other.Name && Rect.Equals(other.Rect)
+                && Alignment == other.Alignment && Pivot.Equals(other.Pivot) && Border.Equals(other.Border)
+                && CustomData == other.CustomData && OutlineTessellation.Equals(other.OutlineTessellation)
+                && PhysicsTessellation.Equals(other.PhysicsTessellation)
+                && PathsEqual(Outlines, other.Outlines) && PathsEqual(PhysicsOutlines, other.PhysicsOutlines);
+        }
+
+        private static bool PathsEqual(List<Vector2[]> a, List<Vector2[]> b)
+        {
+            int count = a?.Count ?? 0;
+            if (count != (b?.Count ?? 0)) return false;
+            for (int i = 0; i < count; i++)
+            {
+                int length = a[i]?.Length ?? 0;
+                if (length != (b[i]?.Length ?? 0)) return false;
+                for (int j = 0; j < length; j++)
+                    if (!a[i][j].Equals(b[i][j])) return false;
+            }
+            return true;
+        }
+
         public SpriteRegion Clone()
         {
             var clone = new SpriteRegion { Id = Id };

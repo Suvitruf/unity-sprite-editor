@@ -51,6 +51,20 @@ Existing outline and collider vertices stay at their original artwork positions,
 
 Bounds editing requires rectangle and pivot editing support; preserving border lines or translated shapes also requires their corresponding editing support/providers. Full-resolution alpha data is required. If the provider returns downsampled pixels, increase the texture import Max Size and reload. Source image pixels are unchanged, and the tool cannot create padding beyond the texture edges.
 
+## Copying properties and shapes
+
+Select one source sprite and click **Copy Properties**. Select one or more destinations, optionally in another texture, and click **Paste Properties…**. The panel uses the copied snapshot, including unapplied source edits. Choose Pivot, Border, Outline, Physics Shape, and/or either tessellation value. Outline and physics source selectors also support transfers between the two shape types. The choices remain selected when reopening the panel during the current window session.
+
+**Pivot coordinates** can copy the normalized alignment/value (retaining a preset), or the pixel offset from the source frame's bottom-left corner. Pixel copying converts a preset to Custom only when necessary. Fractional and outside-frame pivots are supported. Borders copy their pixel insets without scaling; overlapping borders are rejected.
+
+**Shape coordinates** defaults to **Pixels relative to pivot**, which preserves geometry size and its pixel offsets from the pivot. **Pixels from bottom-left** preserves local pixel coordinates relative to the frame origin. **Scale to frame size** explicitly scales X and Y independently with the destination dimensions. When also pasting Pivot, shape alignment uses the resulting destination pivot. Pixel modes do not preserve world size when textures have different Pixels Per Unit; the panel reports this difference.
+
+The viewport previews pivots in blue, borders in yellow, outlines in orange, and physics shapes in green. Outline interiors are tinted so you can inspect artwork outside the proposed render shape, especially when copying a collider into an outline. Dense contours use strokes without a fill. This is a geometry preview; it does not simulate the imported render mesh. Empty copied shapes clear the chosen destination and are identified in the panel. An unavailable source provider is reported separately from an empty shape.
+
+Each target row reports its result. If a contour would extend beyond a destination frame, a border would not fit, or a selected property cannot be edited, pasting is blocked. Uncheck incompatible targets or change the chosen properties/mapping. **Paste Properties** applies every included change together as one Undo step; **Cancel** leaves the document untouched. Each destination owns independent geometry. Names, rectangles, sprite IDs, and importer-specific custom data are retained. Use the main **Apply** button to save.
+
+The package's clipboard survives texture changes, window reopening, and assembly reloads in the same Unity session. It is separate from the operating system clipboard and clears when Unity exits. The versioned payload has an 8 MB size limit. Source images and importer platform settings are not part of the clipboard.
+
 ## Saving and recovery
 
 Apply (Ctrl+S) writes sprite metadata and reimports the texture. Revert reloads the asset and discards unapplied edits and history. Closing or switching textures offers Save/Discard/Cancel; opening the same texture keeps the current session. A failed save keeps the document open.
