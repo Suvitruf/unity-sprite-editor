@@ -5,6 +5,7 @@ using System.Linq;
 using BetterSpriteEditor.DataAccess;
 using BetterSpriteEditor.Model;
 using BetterSpriteEditor.Operations;
+using BetterSpriteEditor.Operations.Bounds;
 using BetterSpriteEditor.Operations.Pivots;
 using BetterSpriteEditor.Operations.Usages;
 using NUnit.Framework;
@@ -223,6 +224,83 @@ namespace BetterSpriteEditor.Tests
             AssetDatabase.TryGetGUIDAndLocalFileIdentifier(sprite, out string newGuid, out long newId);
             Assert.That(newGuid, Is.EqualTo(guid));
             Assert.That(newId, Is.EqualTo(id));
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public void Apply_FrameBoundsPreservesAnchorsShapesAndSpriteReferences(bool uniform)
+        {
+            var raster = new Texture2D(16, 16);
+            var colors = new Color32[16 * 16];
+            try
+            {
+                for (int y = 2; y < 6; y++)
+                    for (int x = 0; x < 16; x++)
+                        if ((x >= 1 && x < 5) || (x >= 10 && x < 14))
+                            colors[y * 16 + x] = new Color32(255, 255, 255, 255);
+                raster.SetPixels32(colors);
+                raster.Apply();
+                File.WriteAllBytes(path, raster.EncodeToPNG());
+            }
+            finally { Object.DestroyImmediate(raster); }
+            AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+            texture = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+            var document = SpriteDocumentRepository.Load(texture);
+            var a = document.Regions.Find(r => r.Name == "A");
+            var b = document.Regions.Find(r => r.Name == "B");
+            if (uniform)
+            {
+                a.Rect = new Rect(2, 2, 4, 4);
+                b.Rect = new Rect(10, 2, 4, 6);
+            }
+            a.Alignment = SpriteAlignment.Center;
+            b.Alignment = SpriteAlignment.BottomCenter;
+            a.Border = uniform ? Vector4.one : new Vector4(2, 3, 3, 3);
+            var shape = new[] { new Vector2(3, 3), new Vector2(5, 3), new Vector2(5, 5), new Vector2(3, 5) }
+                .Select(a.TextureToShapePoint).ToArray();
+            a.Outlines = new List<Vector2[]> { shape };
+            a.PhysicsOutlines = SpriteRegion.ClonePaths(a.Outlines);
+            SpriteDocumentRepository.Save(document);
+            document = SpriteDocumentRepository.Load(texture);
+            var originals = document.Regions.Select(r => r.Clone()).ToArray();
+            var ids = AssetDatabase.LoadAllAssetsAtPath(path).OfType<Sprite>().ToDictionary(s => s.name, s =>
+            {
+                AssetDatabase.TryGetGUIDAndLocalFileIdentifier(s, out string guid, out long id);
+                return (guid, id);
+            });
+            // The provider's readable duplicate needs a graphics device. In headless tests,
+            // use the exact PNG fixture pixels; saving/reloading still uses real importers.
+            var alpha = new TextureAlphaMap(colors, 16, 16, 16, 16);
+            var plan = FrameBounds.Build(document, document.Regions, alpha,
+                new FrameBoundsSettings { Mode = uniform ? FrameBoundsMode.UniformFrameBounds : FrameBoundsMode.TrimTransparency });
+            Assert.That(plan.CanApply, Is.True, plan.Error ?? string.Join("; ", plan.Entries.Select(e => e.Issue)));
+            var history = new HistoryStack(document);
+            history.Do(plan.CreateCommand(document));
+            SpriteDocumentRepository.Save(document);
+            history.MarkSavePoint();
+            var restored = SpriteDocumentRepository.Load(texture);
+            foreach (var original in originals)
+            {
+                var region = restored.FindRegion(original.Id);
+                Assert.That(region.Rect, Is.EqualTo(document.FindRegion(original.Id).Rect));
+                Assert.That(Vector2.Distance(region.GetPivotTexturePosition(), original.GetPivotTexturePosition()), Is.LessThan(0.0001f));
+                Assert.That(region.Border, Is.EqualTo(document.FindRegion(original.Id).Border));
+                foreach (var kind in new[] { ShapeKind.Outline, ShapeKind.Physics })
+                {
+                    var before = original.GetShapes(kind).SelectMany(p => p).Select(original.ShapePointToTexture).ToArray();
+                    var after = region.GetShapes(kind).SelectMany(p => p).Select(region.ShapePointToTexture).ToArray();
+                    Assert.That(after, Is.EqualTo(before));
+                }
+                var sprite = AssetDatabase.LoadAllAssetsAtPath(path).OfType<Sprite>().First(s => s.name == original.Name);
+                AssetDatabase.TryGetGUIDAndLocalFileIdentifier(sprite, out string guid, out long id);
+                Assert.That((guid, id), Is.EqualTo(ids[original.Name]));
+                Assert.That(Vector2.Distance(sprite.rect.position + sprite.pivot, original.GetPivotTexturePosition()), Is.LessThan(0.0001f));
+            }
+            history.Undo();
+            SpriteDocumentRepository.Save(document);
+            restored = SpriteDocumentRepository.Load(texture);
+            foreach (var original in originals)
+                Assert.That(restored.FindRegion(original.Id).Rect, Is.EqualTo(original.Rect));
         }
 
         [Test]

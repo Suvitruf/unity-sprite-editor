@@ -6,6 +6,7 @@ All notable changes to this package are documented in this file. The format is b
 
 ### Added
 
+- Frame Bounds panel with Trim Transparency and Uniform Frame Bounds, previews, alpha threshold/padding/custom size, pivot/shape/9-slice preservation, conflict reporting, and grouped undo/recovery.
 - Relative pivot adjustments: Offset (px) and Shift Pivots add a pixel delta to every selected pivot, including mixed alignments and unequal frame sizes, as one undoable edit.
 - Keep Pivot Position toggle in the region inspector: preserve each pivot's texture position during rectangle resizing, movement, nudging, and numeric multi-edit, with undo/redo and recovery support.
 

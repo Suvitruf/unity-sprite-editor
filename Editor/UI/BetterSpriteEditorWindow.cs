@@ -84,8 +84,10 @@ namespace BetterSpriteEditor.UI
         private ToolbarToggle sliceToggle;
         private ToolbarButton splitButton;
         private ToolbarButton alignPivotsButton;
+        private ToolbarButton boundsButton;
         private SlicePanelElement slicePanel;
         private AlignPivotsPanelElement alignPivotsPanel;
+        private BoundsPanelElement boundsPanel;
         private HistoryPanelElement historyPanel;
         private RegionListPanel regionList;
         private TwoPaneSplitView listSplit;
@@ -145,6 +147,7 @@ namespace BetterSpriteEditor.UI
 
         private void OnDisable()
         {
+            boundsPanel?.Hide();
             AssemblyReloadEvents.beforeAssemblyReload -= SaveRecoverySnapshot;
             SpriteAssetPostprocessor.AssetsChanged -= CheckExternalChanges;
             ShortcutRegistry.Changed -= RefreshShortcutTooltips;
@@ -266,6 +269,7 @@ namespace BetterSpriteEditor.UI
                 {
                     // The overlay panels share the viewport's top-left corner — one at a time.
                     alignPivotsPanel.Hide();
+                    boundsPanel.Hide();
                     slicePanel.Show(document, history, selection, viewport);
                 }
                 else
@@ -281,6 +285,13 @@ namespace BetterSpriteEditor.UI
                 tooltip = "Split the active region into a grid of smaller regions"
             };
             toolbar.Add(splitButton);
+
+            boundsButton = new ToolbarButton(EditSelectedBounds)
+            {
+                text = "Bounds",
+                tooltip = "Trim transparency or use uniform frame bounds while preserving pivot anchors and shapes"
+            };
+            toolbar.Add(boundsButton);
 
             alignPivotsButton = new ToolbarButton(AlignPivotsOfSelection)
             {
@@ -339,6 +350,8 @@ namespace BetterSpriteEditor.UI
             viewportHost.Add(slicePanel);
             alignPivotsPanel = new AlignPivotsPanelElement();
             viewportHost.Add(alignPivotsPanel);
+            boundsPanel = new BoundsPanelElement();
+            viewportHost.Add(boundsPanel);
             viewport.OnionAnchorDragged += alignPivotsPanel.SetAnchorFromViewportDrag;
             split.Add(viewportHost);
 
@@ -442,6 +455,7 @@ namespace BetterSpriteEditor.UI
             viewport?.SetSession(null, null);
             slicePanel?.Hide();
             alignPivotsPanel?.Hide();
+            boundsPanel?.Hide();
             hadUnappliedChanges = false;
             RefreshTarget();
         }
@@ -466,6 +480,7 @@ namespace BetterSpriteEditor.UI
                 ClearShapePreview();
                 slicePanel.Hide();
                 alignPivotsPanel.Hide();
+                boundsPanel.Hide();
                 contentSplit.SetEnabled(false);
                 messageBox.text = exception.Message;
                 messageBox.messageType = HelpBoxMessageType.Warning;
@@ -574,6 +589,7 @@ namespace BetterSpriteEditor.UI
             slicePanel.Hide();
             sliceToggle.SetValueWithoutNotify(false);
             alignPivotsPanel.Hide();
+            boundsPanel.Hide();
             cachedAlphaMap = null; // belongs to the previous texture
             unusedRegionIds.Clear(); // usage results belong to the previous texture
             viewport.SetUnusedRegions(unusedRegionIds);
@@ -602,6 +618,7 @@ namespace BetterSpriteEditor.UI
             sliceToggle.SetEnabled(document.CanChangeRegions);
             modeField.SetEnabled(document.HasOutlineProvider || document.HasPhysicsProvider);
             alignPivotsButton.SetEnabled(document.Capabilities.Has(SpriteEditCapabilities.EditPivot) && selection is { Count: >= 2 });
+            boundsButton.SetEnabled(document.CanPreservePivotPosition && selection is { Count: >= 1 });
             // The preview follows the selection, so picking another sprite re-previews it.
             if (editorMode != EditorMode.SpriteEditor)
                 UpdateShapePreview(inspector.GetShapeSettings());
@@ -722,10 +739,14 @@ namespace BetterSpriteEditor.UI
             sliceToggle.style.display = isSpriteMode ? DisplayStyle.Flex : DisplayStyle.None;
             splitButton.style.display = isSpriteMode ? DisplayStyle.Flex : DisplayStyle.None;
             alignPivotsButton.style.display = isSpriteMode ? DisplayStyle.Flex : DisplayStyle.None;
+            boundsButton.style.display = isSpriteMode ? DisplayStyle.Flex : DisplayStyle.None;
             if (!isSpriteMode && sliceToggle.value)
                 sliceToggle.value = false;
             if (!isSpriteMode)
+            {
                 alignPivotsPanel?.Hide();
+                boundsPanel?.Hide();
+            }
 
             if (shapeTool != null)
                 shapeTool.Kind = mode == EditorMode.CustomOutline ? ShapeKind.Outline : ShapeKind.Physics;
@@ -1034,6 +1055,7 @@ namespace BetterSpriteEditor.UI
             // The overlay panels share the viewport's top-left corner — one at a time.
             if (sliceToggle.value)
                 sliceToggle.value = false;
+            boundsPanel.Hide();
             alignPivotsPanel.Show(document, regions, reference, GetAlphaMap,
                 anchors => viewport.SetOnionSkin(BuildOnionFrames(anchors)),
                 ApplyPivotAnchors);
@@ -1080,6 +1102,17 @@ namespace BetterSpriteEditor.UI
             if (commands.Count == 0)
                 return;
             history.PushApplied(commands.Count == 1 ? commands[0] : new CompositeCommand(label, commands));
+        }
+
+        private void EditSelectedBounds()
+        {
+            if (document == null || !document.CanPreservePivotPosition || selection.Count == 0
+                || editorMode != EditorMode.SpriteEditor)
+                return;
+            if (sliceToggle.value)
+                sliceToggle.value = false;
+            alignPivotsPanel.Hide();
+            boundsPanel.Show(document, selection, history, GetAlphaMap, viewport.SetPreviewRects);
         }
 
         private void SplitActiveRegion()

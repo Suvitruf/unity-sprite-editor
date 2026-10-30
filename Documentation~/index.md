@@ -39,6 +39,18 @@ Under **Pivot**, enter X and Y in **Offset (px)**, then click **Shift Pivots**. 
 
 The offset always uses texture pixels, independent of Unit Mode and Keep Pivot Position. Changing the offset fields does not edit the sprites; each click applies the offset again as one undo step. Shifted presets become Custom, and undo restores their original alignment and value. Rectangles, borders, and outlines stay unchanged. The action works in Single and Multiple mode when pivot editing is supported. Use the main **Apply** action to save.
 
+## Trimming and standardizing frame bounds
+
+Select regions in Multiple mode and click **Bounds** in the toolbar. Choose **Trim Transparency** or **Uniform Frame Bounds**. Orange rectangles preview the proposed bounds; the panel lists each result and any conflict. **Change Bounds** updates the working document as one undo step. Use the main **Apply** button to save, or **Cancel** to discard the preview.
+
+**Trim Transparency** finds pixels whose alpha is greater than the threshold (0–254) and retains the requested padding, capped at the original rectangle. A threshold of 0 includes every nontransparent pixel. Regions with no pixels above the threshold stay unchanged. Trimming preserves fractional and outside-frame pivot anchors, so the artwork keeps its position relative to the pivot.
+
+**Uniform Frame Bounds** calculates the smallest common bounds around the existing pivots that contain every original rectangle. Padding adds space on each side. Disable **Automatic size** to request a larger width and height; extra space is split between opposite sides, with an odd extra pixel on the right/top. Every frame receives the same size and the same pivot offset within its rectangle. Compatible fractional pivot positions are required to keep rectangle edges on whole pixels. This operation retains existing frame content; use Trim first to remove unnecessary margins.
+
+Existing outline and collider vertices stay at their original artwork positions, and nonzero 9-slice border lines remain fixed. The panel blocks the entire batch if a proposed rectangle would clip a shape or border line, extend beyond the texture, or include any nontransparent pixel outside the original region. Resolve the listed conflicts by changing padding, size, selection, pivots, or existing shapes/borders. Empty frames are retained when standardizing sizes.
+
+Bounds editing requires rectangle and pivot editing support; preserving border lines or translated shapes also requires their corresponding editing support/providers. Full-resolution alpha data is required. If the provider returns downsampled pixels, increase the texture import Max Size and reload. Source image pixels are unchanged, and the tool cannot create padding beyond the texture edges.
+
 ## Saving and recovery
 
 Apply (Ctrl+S) writes sprite metadata and reimports the texture. Revert reloads the asset and discards unapplied edits and history. Closing or switching textures offers Save/Discard/Cancel; opening the same texture keeps the current session. A failed save keeps the document open.
